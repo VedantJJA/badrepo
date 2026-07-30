@@ -17,27 +17,18 @@ db.serialize(() => {
   db.run("INSERT INTO users VALUES (2, 'alice', 'password123', 'Alice Personal Note')");
 });
 
-// ----------------------------------------------------
-// Vulnerability 1: Hardcoded Secret & Weak JWT Verification
-// ----------------------------------------------------
 const JWT_SECRET = "super_secret_hardcoded_key_12345";
 
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
-  // Vulnerable authentication logic
   if (username === 'admin' && password === 'admin123') {
     const token = jwt.sign({ username, role: 'admin' }, JWT_SECRET, { algorithm: 'HS256' });
     return res.json({ token });
   }
   return res.status(401).json({ error: 'Invalid credentials' });
 });
-
-// ----------------------------------------------------
-// Vulnerability 2: SQL Injection (SQLi)
-// ----------------------------------------------------
 app.get('/api/users/search', (req, res) => {
   const username = req.query.username;
-  // VULNERABLE: Direct string concatenation in SQL query
   const query = `SELECT id, username, secret_note FROM users WHERE username = '${username}'`;
   
   db.all(query, [], (err, rows) => {
@@ -48,13 +39,9 @@ app.get('/api/users/search', (req, res) => {
   });
 });
 
-// ----------------------------------------------------
-// Vulnerability 3: Command Injection / Remote Code Execution (RCE)
-// ----------------------------------------------------
 app.get('/api/system/ping', (req, res) => {
   const host = req.query.host;
-  // VULNERABLE: User input passed directly into shell exec
-  exec(`ping -c 1 ${host}`, (error, stdout, stderr) => {
+ exec(`ping -c 1 ${host}`, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).send(stderr || error.message);
     }
@@ -62,12 +49,9 @@ app.get('/api/system/ping', (req, res) => {
   });
 });
 
-// ----------------------------------------------------
-// Vulnerability 4: Path Traversal / Arbitrary File Read
-// ----------------------------------------------------
+
 app.get('/api/files/download', (req, res) => {
   const fileName = req.query.file;
-  // VULNERABLE: Unsanitized path join allows ../ traversal
   const filePath = path.join(__dirname, 'public', fileName);
 
   fs.readFile(filePath, 'utf8', (err, data) => {
@@ -78,12 +62,8 @@ app.get('/api/files/download', (req, res) => {
   });
 });
 
-// ----------------------------------------------------
-// Vulnerability 5: Reflected Cross-Site Scripting (XSS)
-// ----------------------------------------------------
 app.get('/welcome', (req, res) => {
   const name = req.query.name || 'Guest';
-  // VULNERABLE: Direct injection of user input into HTML output without escaping
   res.send(`
     <! baseline html >
     <html>
