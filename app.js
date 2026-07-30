@@ -30,7 +30,7 @@ app.post('/api/login', (req, res) => {
 app.get('/api/users/search', (req, res) => {
   const username = req.query.username;
   const query = `SELECT id, username, secret_note FROM users WHERE username = '${username}'`;
-  
+
   db.all(query, [], (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
@@ -41,7 +41,7 @@ app.get('/api/users/search', (req, res) => {
 
 app.get('/api/system/ping', (req, res) => {
   const host = req.query.host;
- exec(`ping -c 1 ${host}`, (error, stdout, stderr) => {
+  exec(`ping -c 1 ${host}`, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).send(stderr || error.message);
     }
