@@ -1,8 +1,12 @@
 function deepMerge(target, source) {
     for (let key in source) {
-        if (typeof source[key] === 'object' && source[key] !== null) {
+        // Prevent Prototype Pollution by blocking sensitive keys
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+            continue;
+        }
 
-            if (!target[key]) {
+        if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
+            if (!target[key] || typeof target[key] !== 'object') {
                 target[key] = {};
             }
 
@@ -13,6 +17,7 @@ function deepMerge(target, source) {
     }
     return target;
 }
+
 const userInput = '{"__proto__": {"isAdmin": true}}';
 const parsedPayload = JSON.parse(userInput);
 
