@@ -1,0 +1,14 @@
+{
+  "name": "badrepo-vulnerable-test-app",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable codebase designed for testing security scanners and static analysis tools.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "sqlite3": "^5.0.2"
+  }
+}
